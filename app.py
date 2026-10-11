@@ -13,7 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from models import User
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config.from_object(Config)
 mysql = MySQL(app)
 csrf = CSRFProtect(app)
