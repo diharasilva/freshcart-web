@@ -2,24 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <base href="https://freshcart-web.onrender.com/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <!-- PWA Manifest Link -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#28a745">
 
     <!-- Service Worker Registration Script -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
-            .then((reg) => console.log('Service Worker registered! Scope:', reg.scope))
-            .catch((err) => console.log('Service Worker registration failed:', err));
-        });
-      }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
+                    .then((reg) => console.log('Service Worker registered! Scope:', reg.scope))
+                    .catch((err) => console.log('Service Worker registration failed:', err));
+            });
+        }
     </script>
-
-    <!-- Rest of your existing head tags (styles, title, etc.) -->
 </head>
 <body>
+    <!-- Your content blocks go here -->
+    {% block content %}{% endblock %}
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
