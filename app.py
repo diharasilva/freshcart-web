@@ -1,3 +1,5 @@
+import pymysql
+pymysql.install_as_MySQLdb()
 import os, math, smtplib
 from email.message import EmailMessage
 from datetime import date
