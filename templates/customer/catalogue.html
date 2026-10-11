@@ -5,7 +5,7 @@
 <div class="sidebar-categories">
     <a href="{{ url_for('index', category='All products') }}" class="{% if not selected_category or selected_category == 'All products' %}active{% endif %}">All products</a>
     {% for cat in categories %}
-    <a href="{{ url_for('index', category=cat.category_name) }}" class="{% if selected_category == cat.category_name %}active{% endif %}">{{ cat.category_name }}</a>
+    <a href="{{ url_for('index', category=cat) }}" class="{% if selected_category == cat %}active{% endif %}">{{ cat }}</a>
     {% endfor %}
 </div>
 

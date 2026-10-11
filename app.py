@@ -88,41 +88,53 @@ def inject_globals():
 @app.route("/")
 def index():
     term = request.args.get("q", "").strip()[:100]
+    category = request.args.get("category", "").strip()
+    
+    base_query = """
+        SELECT p.product_id AS id,
+               p.product_name AS name,
+               p.category_id,
+               c.category_name AS category_name,
+               CONCAT(s.aisle_number, ' (', s.shelf_code, ')') AS shelf_location,
+               s.shelf_code,
+               COALESCE((SELECT SUM(quantity_remaining) FROM batches WHERE product_id = p.product_id), 0) AS stock,
+               (SELECT unit_price FROM batches WHERE product_id = p.product_id ORDER BY received_date ASC LIMIT 1) AS price
+        FROM products p
+        LEFT JOIN categories c ON c.category_id = p.category_id
+        LEFT JOIN shelves s ON s.shelf_id = p.shelf_id
+    """
+    
+    params = []
+    where_clauses = []
+    
     if term:
         like = f"%{term}%"
-        products = query("""
-            SELECT p.product_id AS id, 
-                   p.product_name AS name, 
-                   p.category_id,
-                   c.category_name AS category_name,
-                   CONCAT(s.aisle_number, ' (', s.shelf_code, ')') AS shelf_location,
-                   s.shelf_code,
-                   COALESCE((SELECT SUM(quantity_remaining) FROM batches WHERE product_id = p.product_id), 0) AS stock_qty,
-                   COALESCE((SELECT unit_price FROM batches WHERE product_id = p.product_id ORDER BY expiry_date ASC LIMIT 1), 0.00) AS price
-            FROM products p 
-            LEFT JOIN categories c ON c.category_id = p.category_id 
-            LEFT JOIN shelves s ON s.shelf_id = p.shelf_id
-            WHERE p.product_name LIKE %s OR c.category_name LIKE %s 
-            ORDER BY p.product_name
-        """, (like, like))
-    else:
-        products = query("""
-            SELECT p.product_id AS id, 
-                   p.product_name AS name, 
-                   p.category_id,
-                   c.category_name AS category_name,
-                   CONCAT(s.aisle_number, ' (', s.shelf_code, ')') AS shelf_location,
-                   s.shelf_code,
-                   COALESCE((SELECT SUM(quantity_remaining) FROM batches WHERE product_id = p.product_id), 0) AS stock_qty,
-                   COALESCE((SELECT unit_price FROM batches WHERE product_id = p.product_id ORDER BY expiry_date ASC LIMIT 1), 0.00) AS price
-            FROM products p 
-            LEFT JOIN categories c ON c.category_id = p.category_id 
-            LEFT JOIN shelves s ON s.shelf_id = p.shelf_id
-            ORDER BY p.product_name
-        """)
+        where_clauses.append("(p.product_name LIKE %s OR c.category_name LIKE %s)")
+        params.extend([like, like])
+        
+    if category and category != 'All products':
+        where_clauses.append("c.category_name = %s")
+        params.append(category)
+        
+    if where_clauses:
+        base_query += " WHERE " + " AND ".join(where_clauses)
+        
+    base_query += " ORDER BY p.product_name"
     
-    categories = query("SELECT category_id AS id, category_name AS name FROM categories ORDER BY category_name")
-    return render_template("customer/catalogue.html", products=products, categories=categories, term=term)
+    products = query(base_query, tuple(params))
+    
+    # Static list of categories so the sidebar links always render properly
+    categories_list = [
+        "Bakery & In-House Hot Kitchen",
+        "Beverages",
+        "Biscuits & Confectionery",
+        "Canned & Packaged Foods",
+        "Dairy & Refrigerated",
+        "Household & Cleaning",
+        "Rice & Dry Rations"
+    ]
+    
+    return render_template("customer/catalogue.html", products=products, categories=categories_list, selected_category=category)
 
 @app.route("/register", methods=["GET","POST"])
 def register():
