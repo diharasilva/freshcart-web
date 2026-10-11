@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
+
+<!-- Shop By Categories Sidebar -->
+<div class="sidebar-categories">
+    <a href="{{ url_for('index', category='All products') }}" class="{% if not selected_category or selected_category == 'All products' %}active{% endif %}">All products</a>
+    {% for cat in categories %}
+    <a href="{{ url_for('index', category=cat.category_name) }}" class="{% if selected_category == cat.category_name %}active{% endif %}">{{ cat.category_name }}</a>
+    {% endfor %}
+</div>
+
 <div class="products-grid">
-    <!-- Your product cards loop goes here -->
     {% for product in products %}
     <div class="product-card">
         <div class="product-details">
             <span class="stock-badge">In stock</span>
-            <span class="product-category">{{ product.category }}</span>
+            <span class="product-category">{{ product.category_name }}</span>
             <h4 class="product-title">{{ product.name }}</h4>
             <div class="product-price">Rs. {{ product.price }}</div>
-            <div class="product-location">📍 {{ product.location }}</div>
+            <div class="product-location">📍 {{ product.shelf_location }}</div>
             <div class="product-stock">{{ product.stock }} available</div>
             
             <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="add-to-cart-form">
