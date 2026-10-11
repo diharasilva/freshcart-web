@@ -1,1 +1,19 @@
-{% extends 'base.html' %}{% block title %}Shop{% endblock %}{% block content %}<div class="hero mb-4"><div><p class="eyebrow">DEALZ SUPER · MAHARAGAMA</p><h1>Good food. <span>Good deals.</span></h1><p class="text-secondary">Find everyday essentials, check shelf locations, and shop with confidence.</p></div><div class="hero-bubble">FC</div></div><div class="row g-4"><aside class="col-lg-2"><div class="sidebar-card"><h6>SHOP BY</h6><a class="category-link active" href="{{ url_for('index') }}">All products</a>{% for c in categories %}<a class="category-link" href="{{ url_for('index',q=c.name) }}">{{ c.name }}</a>{% endfor %}{% if current_user.is_authenticated and current_user.role=='customer' %}<hr><h6>NEARBY DEALS</h6><p class="small text-secondary">Share your location to check offers within 2 km of the store.</p><button class="btn btn-success btn-sm w-100" id="geo-btn">Find local deals</button><div id="geo-result" class="small mt-2"></div>{% endif %}</div></aside><section class="col-lg-10"><div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3"><div><h2 class="section-title">Popular products</h2><p class="text-secondary small mb-0">{{ products|length }} items in catalogue</p></div><form class="d-flex search-box" method="get"><input class="form-control" name="q" value="{{ term }}" placeholder="Search milk, rice, tea..."><button class="btn btn-success">Search</button></form></div><div class="row g-3">{% for p in products %}<div class="col-sm-6 col-xl-3"><div class="product-card h-100"><div class="product-image">{% if p.image_url %}<img src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy">{% else %}<div class="image-placeholder">FreshCart</div>{% endif %}{% if p.stock_qty==0 %}<span class="stock-badge out">Out of stock</span>{% elif p.stock_qty<=5 %}<span class="stock-badge low">Low stock</span>{% else %}<span class="stock-badge">In stock</span>{% endif %}</div><div class="p-3"><div class="text-secondary small">{{ p.category_name or 'General' }}</div><h5 class="product-name">{{ p.name }}</h5><div class="price">Rs. {{ '%.2f'|format(p.price) }}</div><div class="shelf"><span>⌖</span> {{ p.aisle or 'Store floor' }} <small>({{ p.shelf_location or 'Ask staff' }})</small></div><div class="small text-secondary mt-1">{{ p.stock_qty }} available</div><form method="post" action="{{ url_for('add_to_cart',product_id=p.id) }}" class="d-flex gap-2 mt-3"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input class="form-control form-control-sm qty-input" type="number" name="qty" min="1" max="99" value="1" aria-label="Quantity"><button class="btn btn-success btn-sm flex-grow-1" {% if p.stock_qty==0 %}disabled{% endif %}>Add to cart</button></form></div></div></div>{% else %}<div class="empty-state">No products found. Try another search.</div>{% endfor %}</div></section></div>{% endblock %}
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-details">
+            <span class="stock-badge">In stock</span>
+            <span class="product-category">{{ product.category }}</span>
+            <h4 class="product-title">{{ product.name }}</h4>
+            <div class="product-price">Rs. {{ product.price }}</div>
+            <div class="product-location">📍 {{ product.location }}</div>
+            <div class="product-stock">{{ product.stock }} available</div>
+            
+            <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="add-to-cart-form">
+                <input type="number" name="quantity" value="1" min="1" class="qty-input">
+                <button type="submit" class="btn-add">Add to cart</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
