@@ -1,31 +1,67 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Shop By Categories Sidebar -->
-<div class="sidebar-categories">
-    <a href="{{ url_for('index', category='All products') }}" class="{% if not selected_category or selected_category == 'All products' %}active{% endif %}">All products</a>
-    {% for cat in categories %}
-    <a href="{{ url_for('index', category=cat) }}" class="{% if selected_category == cat %}active{% endif %}">{{ cat }}</a>
-    {% endfor %}
+<!-- Hero Banner -->
+<div class="hero-banner">
+    <div class="hero-content">
+        <span class="hero-subtitle">DEALZ SUPER - MAHARAGAMA</span>
+        <h1>Good food. Good deals.</h1>
+        <p>Find everyday essentials, check shelf locations, and shop with confidence.</p>
+    </div>
+    <div class="hero-logo-badge">FC</div>
 </div>
 
-<div class="products-grid">
-    {% for product in products %}
-    <div class="product-card">
-        <div class="product-details">
-            <span class="stock-badge">In stock</span>
-            <span class="product-category">{{ product.category_name }}</span>
-            <h4 class="product-title">{{ product.name }}</h4>
-            <div class="product-price">Rs. {{ product.price }}</div>
-            <div class="product-location">📍 {{ product.shelf_location }}</div>
-            <div class="product-stock">{{ product.stock }} available</div>
-            
-            <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="add-to-cart-form">
-                <input type="number" name="quantity" value="1" min="1" class="qty-input">
-                <button type="submit" class="btn-add">Add to cart</button>
-            </form>
+<!-- Main Layout Container for Sidebar and Content -->
+<div class="main-layout" style="display: flex; gap: 30px; align-items: flex-start; margin-top: 20px;">
+
+    <!-- Left "SHOP BY" Sidebar -->
+    <div class="sidebar" style="min-width: 220px; background: #151a16; padding: 20px; border-radius: 12px; border: 1px solid #232d24;">
+        <h3 style="color: #a3e635; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Shop by</h3>
+        <div class="sidebar-categories" style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="{{ url_for('index', category='All products') }}" style="color: {% if not selected_category or selected_category == 'All products' %}#a3e635{% else %}#d1d5db{% endif %}; text-decoration: none; font-weight: 500;">All products</a>
+            {% for cat in categories %}
+            <a href="{{ url_for('index', category=cat) }}" style="color: {% if selected_category == cat %}#a3e635{% else %}#d1d5db{% endif %}; text-decoration: none; font-weight: 500;">{{ cat }}</a>
+            {% endfor %}
         </div>
     </div>
-    {% endfor %}
+
+    <!-- Right Products Area -->
+    <div class="content-area" style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h2 style="color: white; font-size: 24px; margin: 0;">Popular products</h2>
+                <span style="color: #9ca3af; font-size: 13px;">Browse items in catalogue</span>
+            </div>
+            
+            <!-- Search Bar Form -->
+            <form method="GET" action="{{ url_for('index') }}" style="display: flex; gap: 8px;">
+                <input type="text" name="q" placeholder="Search milk, rice, tea..." value="{{ request.args.get('q', '') }}" style="background: #0f1410; border: 1px solid #232d24; color: white; padding: 8px 14px; border-radius: 6px; outline: none; width: 220px;">
+                <button type="submit" style="background: #a3e635; color: #0f1410; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Search</button>
+            </form>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;">
+            {% for product in products %}
+            <div class="product-card" style="background: #151a16; border: 1px solid #232d24; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="product-details">
+                    <span class="stock-badge" style="background: #232d24; color: #a3e635; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">In stock</span>
+                    <span class="product-category" style="display: block; color: #9ca3af; font-size: 12px; margin-top: 10px;">{{ product.category_name }}</span>
+                    <h4 class="product-title" style="color: white; font-size: 15px; margin: 6px 0 10px 0; font-weight: 600;">{{ product.name }}</h4>
+                    <div class="product-price" style="color: #a3e635; font-size: 16px; font-weight: bold; margin-bottom: 8px;">Rs. {{ product.price }}</div>
+                    <div class="product-location" style="color: #9ca3af; font-size: 12px; margin-bottom: 4px;">📍 {{ product.shelf_location }}</div>
+                    <div class="product-stock" style="color: #9ca3af; font-size: 12px; margin-bottom: 14px;">{{ product.stock }} available</div>
+                </div>
+                
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="add-to-cart-form" style="display: flex; gap: 8px;">
+                    <input type="number" name="quantity" value="1" min="1" class="qty-input" style="width: 50px; background: #0f1410; border: 1px solid #232d24; color: white; text-align: center; border-radius: 6px;">
+                    <button type="submit" class="btn-add" style="flex: 1; background: #a3e635; color: #0f1410; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer;">Add to cart</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
 </div>
+
 {% endblock %}
