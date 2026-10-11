@@ -10,6 +10,10 @@ class Config:
     MYSQL_DB = os.getenv("MYSQL_DB", "dealz_super_db")
     MYSQL_PORT = int(os.getenv("MYSQL_PORT", 24414))
     MYSQL_CURSORCLASS = "DictCursor"
+    
+    # Add this line to handle Aiven SSL connection requirements:
+    MYSQL_CUSTOM_OPTIONS = {'ssl': {'check_hostname': False}}
+
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     REMEMBER_COOKIE_HTTPONLY = True
