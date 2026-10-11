@@ -333,7 +333,7 @@ def admin_dashboard():
 # orders=query("SELECT o.*,u.name AS customer_name FROM orders o JOIN users u ON u.id=o.customer_id ORDER BY o.created_at DESC LIMIT 12")
     orders = query("SELECT o.*, u.name AS customer_name FROM orders o JOIN users u ON u.id = o.customer_id ORDER BY o.order_date DESC LIMIT 12")
     return render_template("admin/dashboard.html", stats=stats, low=low, orders=orders)
-    @csrf.exempt
+@csrf.exempt
 @app.route("/admin/product/scan", methods=["POST"])
 @admin_required
 def scan_product():
@@ -342,9 +342,9 @@ def scan_product():
     cur.execute("SELECT product_id, product_name, barcode FROM products WHERE barcode = %s", (barcode,))
     product = cur.fetchone()
     cur.close()
-   if product:
+    if product:
         return {"exists": True, "product_id": product[0], "product_name": product[1]}
-   return {"exists": False}
+    return {"exists": False}
 @app.route("/admin/products",methods=["GET","POST"])
 @admin_required
 def admin_products():
