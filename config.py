@@ -4,10 +4,11 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-this-secret")
-    MYSQL_HOST = 'localhost'
-    MYSQL_USER = 'root'
-    MYSQL_PASSWORD = 'xtdq7001#'  
-    MYSQL_DB = 'dealz_super_db'
+    MYSQL_HOST = os.getenv("MYSQL_HOST", "mysql-11076237-kalanidihara-c497.l.aivencloud.com")
+    MYSQL_USER = os.getenv("MYSQL_USER", "avnadmin")
+    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+    MYSQL_DB = os.getenv("MYSQL_DB", "dealz_super_db")
+    MYSQL_PORT = int(os.getenv("MYSQL_PORT", 24414))
     MYSQL_CURSORCLASS = "DictCursor"
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
