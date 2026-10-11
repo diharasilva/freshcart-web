@@ -288,8 +288,6 @@ def checkout():
     
     flash(f"Order #{order_id} placed successfully!", "success")
     return redirect(url_for("my_orders"))
-            flash(f"Order #{order_id} placed successfully!", "success")
-            return redirect(url_for("my_orders"))
             
     return render_template("customer/checkout.html", items=items, total=total)
 
