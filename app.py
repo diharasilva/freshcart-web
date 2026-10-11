@@ -342,9 +342,9 @@ def scan_product():
     cur.execute("SELECT product_id, product_name, barcode FROM products WHERE barcode = %s", (barcode,))
     product = cur.fetchone()
     cur.close()
-    if product:
+   if product:
         return {"exists": True, "product_id": product[0], "product_name": product[1]}
-    return {"exists": False}
+   return {"exists": False}
 @app.route("/admin/products",methods=["GET","POST"])
 @admin_required
 def admin_products():
