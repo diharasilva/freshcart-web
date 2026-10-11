@@ -98,7 +98,7 @@ def index():
                CONCAT(s.aisle_number, ' (', s.shelf_code, ')') AS shelf_location,
                s.shelf_code,
                COALESCE((SELECT SUM(quantity_remaining) FROM batches WHERE product_id = p.product_id), 0) AS stock,
-               (SELECT unit_price FROM batches WHERE product_id = p.product_id ORDER BY received_date ASC LIMIT 1) AS price
+               (SELECT unit_price FROM batches WHERE product_id = p.product_id ORDER BY batch_id ASC LIMIT 1) AS price
         FROM products p
         LEFT JOIN categories c ON c.category_id = p.category_id
         LEFT JOIN shelves s ON s.shelf_id = p.shelf_id
@@ -123,7 +123,6 @@ def index():
     
     products = query(base_query, tuple(params))
     
-    # Static list of categories so the sidebar links always render properly
     categories_list = [
         "Bakery & In-House Hot Kitchen",
         "Beverages",
