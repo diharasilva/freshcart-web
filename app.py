@@ -60,6 +60,30 @@ def send_email(to, subject, body):
     except (OSError, smtplib.SMTPException) as exc:
         app.logger.exception("Email delivery failed: %s", exc); return False
 
+def send_order_receipt(customer_email, customer_name, order_id, items, total_amount):
+    subject = f"FreshCart Order Receipt #{order_id}"
+    
+    items_summary = ""
+    for item in items:
+        items_summary += f"• {item['name']} (x{item['qty']}) - Rs. {item['subtotal']:.2f}\n"
+    
+    body = f"""Hello {customer_name},
+
+Thank you for your order at FreshCart (Dealz Super - Maharagama)!
+
+Order ID: #{order_id}
+
+--- ORDER DETAILS ---
+{items_summary}
+---------------------
+Total Amount Paid: Rs. {total_amount:.2f}
+
+We hope to see you again soon!
+
+Best regards,
+The FreshCart Team
+"""
+    return send_email(customer_email, subject, body)
 def cart_items():
     cart = session.get("cart", {})
     if not cart: return [], Decimal("0.00")
@@ -244,9 +268,26 @@ def checkout():
             
             cur.close()
             session["cart"] = {}
-            body = f"Hello {current_user.name},\n\nThank you for your order #{order_id} at Dealz Super Maharagama.\n" + "\n".join(f"{i['name']} x {i['qty']} = Rs. {i['subtotal']:.2f}" for i in items) + f"\nTotal: Rs. {total:.2f}\nFulfilment: {method.title()}\nStatus: Pending\n\nThis is your order receipt."
-            send_email(current_user.email, f"FreshCart invoice — Order #{order_id}", body)
-            execute("INSERT INTO email_logs(user_id,email_type,recipient,subject_line,status) VALUES(%s,'invoice',%s,%s,'queued')", (current_user.id, current_user.email, f"FreshCart invoice — Order #{order_id}"))
+    
+    # Build itemized receipt and send via helper function
+    receipt_items = []
+    for item in items:
+        receipt_items.append({
+            'name': item['name'],
+            'qty': item['qty'],
+            'subtotal': float(item['price']) * item['qty']
+        })
+        
+    send_order_receipt(
+        customer_email=current_user.email,
+        customer_name=current_user.username,
+        order_id=order_id,
+        items=receipt_items,
+        total_amount=float(total)
+    )
+    
+    flash(f"Order #{order_id} placed successfully!", "success")
+    return redirect(url_for("my_orders"))
             flash(f"Order #{order_id} placed successfully!", "success")
             return redirect(url_for("my_orders"))
             
