@@ -1,4 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
 <div class="products-grid">
+    <!-- Your product cards loop goes here -->
     {% for product in products %}
     <div class="product-card">
         <div class="product-details">
@@ -17,3 +20,4 @@
     </div>
     {% endfor %}
 </div>
+{% endblock %}
